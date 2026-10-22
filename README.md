@@ -95,6 +95,11 @@ git push
 
 ---
 
+## !Preview
+<img width="1027" height="848" alt="Shot-2026-10-22-234452" src="https://github.com/user-attachments/assets/0493a03e-999e-4a1c-b9ae-a558b28b2c3d" />
+
+---
+
 **Author:** [Braveen R](https://braveenr.linklee.in/)</br>
 
 ---
