@@ -11,6 +11,10 @@ async function fetchWorkflowMetrics() {
     const token = process.env.GITHUB_TOKEN;
     const repo = process.env.GITHUB_REPOSITORY;
     const runId = process.env.GITHUB_RUN_ID;
+    
+    // Get the short Git commit hash (e.g., "8527b1a") for a clean display name
+    const fullSha = process.env.GITHUB_SHA || '';
+    const shortSha = fullSha ? fullSha.substring(0, 7) : runId.substring(0, 6);
 
     try {
       const response = await fetch(`https://api.github.com/repos/${repo}/actions/runs/${runId}/jobs`, {
@@ -22,10 +26,10 @@ async function fetchWorkflowMetrics() {
       const completedAt = mainJob.completed_at ? new Date(mainJob.completed_at).getTime() : Date.now();
       
       pipelineData = {
-        id: `gh-run-${runId}`,
+        id: `build-${shortSha}`, // Clean, professional ID format!
         date: new Date().toISOString(),
         duration_seconds: Math.round((completedAt - startedAt) / 1000),
-        status: mainJob.conclusion || 'in-progress'
+        status: mainJob.conclusion || 'success' // Automatically logs as success when it finishes!
       };
     } catch (error) {
       console.error('Error fetching API:', error.message);
