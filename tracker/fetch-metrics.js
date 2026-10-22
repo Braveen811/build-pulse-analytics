@@ -1,19 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-// Configuration
 const dataFilePath = path.join(__dirname, '..', 'data', 'metrics.json');
 
 async function fetchWorkflowMetrics() {
   console.log('🚀 Starting Build-Pulse Analytics Tracker...');
-
-  // 1. Check if we are running in GitHub Actions or Local Dev
   const isGitHubAction = process.env.GITHUB_ACTIONS === 'true';
   let pipelineData = {};
 
   if (isGitHubAction) {
     console.log('Detected GitHub Actions environment. Fetching live API data...');
-    // In production, we fetch real metrics using the injected GitHub token
     const token = process.env.GITHUB_TOKEN;
     const repo = process.env.GITHUB_REPOSITORY;
     const runId = process.env.GITHUB_RUN_ID;
@@ -28,20 +24,27 @@ async function fetchWorkflowMetrics() {
       
       const data = await response.json();
       
-      // Extract the total duration of the CI/CD pipeline
+      // FIX: Ensure we have job data, and handle 'null' completion times for in-progress runs
+      if (!data.jobs || data.jobs.length === 0) {
+        throw new Error("No jobs returned from GitHub API.");
+      }
+
       const mainJob = data.jobs[0]; 
       const startedAt = new Date(mainJob.started_at).getTime();
-      const completedAt = new Date(mainJob.completed_at).getTime();
+      // If the job is still running, use the current time to calculate duration
+      const completedAt = mainJob.completed_at ? new Date(mainJob.completed_at).getTime() : Date.now();
       
       pipelineData = {
-        id: runId,
+        id: `gh-run-${runId}`,
         date: new Date().toISOString(),
-        duration_seconds: (completedAt - startedAt) / 1000,
-        status: mainJob.conclusion,
+        duration_seconds: Math.round((completedAt - startedAt) / 1000),
+        status: mainJob.conclusion || 'in-progress',
         steps: mainJob.steps.map(step => ({
           name: step.name,
-          duration_seconds: (new Date(step.completed_at).getTime() - new Date(step.started_at).getTime()) / 1000,
-          status: step.conclusion
+          duration_seconds: step.completed_at 
+            ? Math.round((new Date(step.completed_at).getTime() - new Date(step.started_at).getTime()) / 1000)
+            : 0,
+          status: step.conclusion || 'pending'
         }))
       };
     } catch (error) {
@@ -49,38 +52,25 @@ async function fetchWorkflowMetrics() {
       process.exit(1);
     }
   } else {
-    console.log('Detected Local Environment. Generating mock telemetry data...');
-    // Local dev mode: Generate realistic fake data to build the UI
+    // Local Dev Mock Data
     pipelineData = {
       id: `local-run-${Math.floor(Math.random() * 10000)}`,
       date: new Date().toISOString(),
-      duration_seconds: Math.floor(Math.random() * 120) + 30, // 30 to 150 seconds
-      status: Math.random() > 0.1 ? 'success' : 'failure',
-      steps: [
-        { name: 'Set up job', duration_seconds: 4, status: 'success' },
-        { name: 'Run actions/checkout', duration_seconds: 2, status: 'success' },
-        { name: 'Gitleaks Security Scan', duration_seconds: 15, status: 'success' },
-        { name: 'Docker Build & Trivy Scan', duration_seconds: Math.floor(Math.random() * 60) + 20, status: 'success' },
-        { name: 'Push to GHCR', duration_seconds: 12, status: 'success' }
-      ]
+      duration_seconds: Math.floor(Math.random() * 120) + 30,
+      status: Math.random() > 0.1 ? 'success' : 'failure'
     };
   }
 
-  // 2. Read existing database (metrics.json)
   let db = [];
   if (fs.existsSync(dataFilePath)) {
-    const rawData = fs.readFileSync(dataFilePath);
-    db = JSON.parse(rawData);
+    db = JSON.parse(fs.readFileSync(dataFilePath));
   }
 
-  // 3. Append new run data and keep only the last 100 runs (prevent file bloat)
   db.push(pipelineData);
   if (db.length > 100) db.shift(); 
 
-  // 4. Save back to the database file
   fs.writeFileSync(dataFilePath, JSON.stringify(db, null, 2));
-  console.log(`✅ Successfully logged build metrics for run: ${pipelineData.id}`);
-  console.log(`⏱️ Total Build Time: ${pipelineData.duration_seconds}s`);
+  console.log(`✅ Successfully logged metrics for: ${pipelineData.id}`);
 }
 
 fetchWorkflowMetrics();

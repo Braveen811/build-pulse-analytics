@@ -5,20 +5,19 @@ function App() {
   const [kpis, setKpis] = useState({ avgTime: 0, successRate: 0, total: 0 });
 
   useEffect(() => {
-    // Fetch live data directly from your GitHub repository (Cache-busted to ensure fresh data)
-    const liveDataUrl = 'https://raw.githubusercontent.com/Braveen811/build-pulse-analytics/main/data/metrics.json';
+    // The timestamp strictly prevents the browser or GitHub CDN from caching old data
+    const liveDataUrl = `https://raw.githubusercontent.com/Braveen811/build-pulse-analytics/main/data/metrics.json?t=${new Date().getTime()}`;
     
-    fetch(`${liveDataUrl}?t=${Date.now()}`)
+    fetch(liveDataUrl, { cache: "no-store" })
       .then((res) => res.json())
       .then((allMetrics) => {
-        // Calculate Analytics
         const total = allMetrics.length;
         const avgTime = total > 0 ? Math.round(allMetrics.reduce((acc, curr) => acc + curr.duration_seconds, 0) / total) : 0;
-        const successCount = allMetrics.filter(m => m.status === 'success').length;
+        const successCount = allMetrics.filter(m => m.status === 'success' || m.status === 'in-progress').length;
         const successRate = total > 0 ? Math.round((successCount / total) * 100) : 0;
 
         setKpis({ avgTime, successRate, total });
-        setMetrics(allMetrics.reverse()); // Show newest first
+        setMetrics(allMetrics.reverse());
       })
       .catch((err) => console.error("Error loading live metrics:", err));
   }, []);
@@ -30,7 +29,6 @@ function App() {
       </h1>
       
       <div className="w-full max-w-4xl">
-        {/* KPI Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-command-bg border border-command-accent shadow-[0_0_15px_var(--color-command-shadow)] p-6 rounded-lg text-center">
             <p className="text-sm text-gray-300 uppercase tracking-wider mb-2">Total Runs</p>
@@ -46,7 +44,6 @@ function App() {
           </div>
         </div>
 
-        {/* Pipeline History List */}
         <div className="bg-command-bg border border-command-accent shadow-[0_0_25px_var(--color-command-shadow)] p-6 rounded-lg">
           <h2 className="text-lg font-semibold mb-4 text-gray-200 border-b border-command-accent pb-2">
             Pipeline History
