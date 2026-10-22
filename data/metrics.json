@@ -31,5 +31,58 @@
         "status": "success"
       }
     ]
+  },
+  {
+    "id": "gh-run-39824508484",
+    "date": "2026-10-22T17:39:08.809Z",
+    "duration_seconds": 24,
+    "status": "in-progress",
+    "steps": [
+      {
+        "name": "Set up job",
+        "duration_seconds": 1,
+        "status": "success"
+      },
+      {
+        "name": "Checkout Repository",
+        "duration_seconds": 1,
+        "status": "success"
+      },
+      {
+        "name": "Set up Node.js",
+        "duration_seconds": 5,
+        "status": "success"
+      },
+      {
+        "name": "Run Security Scans (Simulated)",
+        "duration_seconds": 5,
+        "status": "success"
+      },
+      {
+        "name": "Build Application (Simulated)",
+        "duration_seconds": 10,
+        "status": "success"
+      },
+      {
+        "name": "Run Build-Pulse Tracker",
+        "duration_seconds": 0,
+        "status": "pending"
+      },
+      {
+        "name": "Save Metrics to Repository",
+        "duration_seconds": 0,
+        "status": "pending"
+      },
+      {
+        "name": "Post Set up Node.js",
+        "duration_seconds": 0,
+        "status": "pending"
+      },
+      {
+        "name": "Post Checkout Repository",
+        "duration_seconds": 0,
+        "status": "pending"
+      }
+    ]
   }
 ]
