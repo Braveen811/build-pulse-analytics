@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-command-bg: #8A0F13;
+  --color-command-accent: #B21318;
+  --color-command-shadow: #4A080A;
+  --color-command-dark: #1a0304; /* Deep, near-black red for the main page background */
+}
+
+body {
+  background-color: var(--color-command-dark);
+  color: white;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}

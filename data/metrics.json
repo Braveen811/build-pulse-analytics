@@ -1,0 +1,35 @@
+[
+  {
+    "id": "local-run-9415",
+    "date": "2026-10-22T16:57:38.994Z",
+    "duration_seconds": 91,
+    "status": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "duration_seconds": 4,
+        "status": "success"
+      },
+      {
+        "name": "Run actions/checkout",
+        "duration_seconds": 2,
+        "status": "success"
+      },
+      {
+        "name": "Gitleaks Security Scan",
+        "duration_seconds": 15,
+        "status": "success"
+      },
+      {
+        "name": "Docker Build & Trivy Scan",
+        "duration_seconds": 61,
+        "status": "success"
+      },
+      {
+        "name": "Push to GHCR",
+        "duration_seconds": 12,
+        "status": "success"
+      }
+    ]
+  }
+]
