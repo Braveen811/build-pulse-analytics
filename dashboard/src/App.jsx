@@ -6,7 +6,7 @@ function App() {
 
   useEffect(() => {
     // The timestamp strictly prevents the browser or GitHub CDN from caching old data
-    const liveDataUrl = `https://raw.githubusercontent.com/Braveen811/build-pulse-analytics/main/data/metrics.json?t=${new Date().getTime()}`;
+    const liveDataUrl = `https://raw.githubusercontent.com/Braveen811/build-pulse-analytics/main/data/metrics.json?t=${Date.now()}`;
     
     fetch(liveDataUrl, { cache: "no-store" })
       .then((res) => res.json())
@@ -56,7 +56,7 @@ function App() {
                   <span className="text-xs text-gray-500">{new Date(run.date).toLocaleString()}</span>
                 </div>
                 <span className="text-2xl font-bold text-white">{run.duration_seconds}s</span>
-                <span className={`px-3 py-1 rounded text-sm font-bold uppercase tracking-widest ${run.status === 'success' ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                <span className={`px-3 py-1 rounded text-sm font-bold uppercase tracking-widest ${run.status === 'success' || run.status === 'in-progress' ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
                   {run.status}
                 </span>
               </div>
