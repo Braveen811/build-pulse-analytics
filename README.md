@@ -1,4 +1,4 @@
-```markdown
+
 # ⚡ Build-Pulse Analytics
 
 > A zero-cost, serverless DevOps observability platform that extracts real-time CI/CD pipeline metrics from GitHub Actions and visualizes them on a high-performance React command center.
